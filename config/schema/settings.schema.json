@@ -1,0 +1,192 @@
+{
+  "$defs": {
+    "CostSettings": {
+      "additionalProperties": false,
+      "properties": {
+        "commission_per_contract": {
+          "anyOf": [
+            {
+              "minimum": 0.0,
+              "type": "number"
+            },
+            {
+              "pattern": "^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d*$",
+              "type": "string"
+            }
+          ],
+          "default": "0",
+          "title": "Commission Per Contract"
+        },
+        "slippage_points": {
+          "anyOf": [
+            {
+              "minimum": 0.0,
+              "type": "number"
+            },
+            {
+              "pattern": "^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d*$",
+              "type": "string"
+            }
+          ],
+          "default": "0",
+          "title": "Slippage Points"
+        }
+      },
+      "title": "CostSettings",
+      "type": "object"
+    },
+    "Environment": {
+      "enum": [
+        "development",
+        "test",
+        "paper",
+        "live"
+      ],
+      "title": "Environment",
+      "type": "string"
+    },
+    "Provider": {
+      "enum": [
+        "disabled",
+        "pending"
+      ],
+      "title": "Provider",
+      "type": "string"
+    },
+    "SecretSettings": {
+      "additionalProperties": false,
+      "properties": {
+        "provider_token": {
+          "anyOf": [
+            {
+              "format": "password",
+              "type": "string",
+              "writeOnly": true
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Provider Token"
+        }
+      },
+      "title": "SecretSettings",
+      "type": "object"
+    },
+    "SessionSettings": {
+      "additionalProperties": false,
+      "properties": {
+        "end": {
+          "default": "16:00:00",
+          "format": "time",
+          "title": "End",
+          "type": "string"
+        },
+        "start": {
+          "default": "09:30:00",
+          "format": "time",
+          "title": "Start",
+          "type": "string"
+        },
+        "timezone": {
+          "default": "America/New_York",
+          "title": "Timezone",
+          "type": "string"
+        }
+      },
+      "title": "SessionSettings",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "broker": {
+      "$ref": "#/$defs/Provider",
+      "default": "disabled"
+    },
+    "broker_submission_enabled": {
+      "default": false,
+      "title": "Broker Submission Enabled",
+      "type": "boolean"
+    },
+    "costs": {
+      "$ref": "#/$defs/CostSettings",
+      "default": {
+        "commission_per_contract": "0",
+        "slippage_points": "0"
+      }
+    },
+    "data_provider": {
+      "$ref": "#/$defs/Provider",
+      "default": "disabled"
+    },
+    "environment": {
+      "$ref": "#/$defs/Environment",
+      "default": "development"
+    },
+    "live_trading_enabled": {
+      "default": false,
+      "title": "Live Trading Enabled",
+      "type": "boolean"
+    },
+    "maximum_daily_loss_fraction": {
+      "anyOf": [
+        {
+          "type": "number"
+        },
+        {
+          "pattern": "^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d*$",
+          "type": "string"
+        }
+      ],
+      "default": "0.03",
+      "title": "Maximum Daily Loss Fraction"
+    },
+    "maximum_drawdown_fraction": {
+      "anyOf": [
+        {
+          "type": "number"
+        },
+        {
+          "pattern": "^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d*$",
+          "type": "string"
+        }
+      ],
+      "default": "0.10",
+      "title": "Maximum Drawdown Fraction"
+    },
+    "maximum_risk_fraction": {
+      "anyOf": [
+        {
+          "type": "number"
+        },
+        {
+          "pattern": "^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d*$",
+          "type": "string"
+        }
+      ],
+      "default": "0.01",
+      "title": "Maximum Risk Fraction"
+    },
+    "permitted_symbol": {
+      "default": "MNQ",
+      "title": "Permitted Symbol",
+      "type": "string"
+    },
+    "secrets": {
+      "$ref": "#/$defs/SecretSettings",
+      "default": {}
+    },
+    "session": {
+      "$ref": "#/$defs/SessionSettings",
+      "default": {
+        "end": "16:00:00",
+        "start": "09:30:00",
+        "timezone": "America/New_York"
+      }
+    }
+  },
+  "title": "Settings",
+  "type": "object"
+}

@@ -1,0 +1,88 @@
+[build-system]
+requires = ["hatchling==1.27.0"]
+build-backend = "hatchling.build"
+
+[project]
+name = "mnq-system"
+version = "0.1.0"
+description = "Safety-critical foundation for MNQ futures research"
+readme = "README.md"
+requires-python = ">=3.12,<3.13"
+dependencies = [
+  "pydantic==2.12.4",
+  "pydantic-settings==2.14.2",
+  "PyYAML==6.0.3",
+]
+
+[dependency-groups]
+dev = [
+  "bandit==1.9.2",
+  "hypothesis==6.148.3",
+  "pip-audit==2.9.0",
+  "pre-commit==4.5.0",
+  "pyright==1.1.407",
+  "pytest==9.0.3",
+  "pytest-cov==7.0.0",
+  "ruff==0.14.6",
+]
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/mnq_system"]
+
+[tool.ruff]
+target-version = "py312"
+line-length = 100
+src = ["src", "tests", "scripts"]
+
+[tool.ruff.lint]
+select = [
+  "E", "F", "I", "UP", "B", "C4", "SIM", "PT", "S", "ARG", "BLE", "DTZ", "TC", "RUF",
+]
+ignore = [
+  "S101", # Assertions are the idiomatic contract in tests.
+  "S603", # verify.py uses fixed, repository-owned subprocess commands.
+]
+
+[tool.ruff.lint.per-file-ignores]
+"tests/**/*.py" = ["S105", "S106"] # Test-only fake secrets exercise redaction.
+
+[tool.ruff.format]
+quote-style = "double"
+indent-style = "space"
+line-ending = "lf"
+
+[tool.pyright]
+include = ["src", "tests", "scripts"]
+exclude = [".venv"]
+pythonVersion = "3.12"
+pythonPlatform = "All"
+typeCheckingMode = "strict"
+reportMissingTypeStubs = "error"
+reportUnknownArgumentType = "error"
+reportUnknownMemberType = "error"
+reportUnknownParameterType = "error"
+reportUnknownVariableType = "error"
+reportUnnecessaryTypeIgnoreComment = "error"
+venvPath = "."
+venv = ".venv"
+
+[tool.pytest.ini_options]
+addopts = "--strict-config --strict-markers --cov=mnq_system --cov-report=term-missing --cov-fail-under=90"
+testpaths = ["tests"]
+markers = ["architecture: architectural boundary tests"]
+
+[tool.coverage.run]
+branch = true
+source = ["mnq_system"]
+
+[tool.coverage.report]
+show_missing = true
+skip_covered = true
+exclude_also = ["if TYPE_CHECKING:", '\.\.\.']
+
+[tool.bandit]
+recurse = true
+targets = ["src", "scripts"]
+exclude_dirs = ["tests"]
+# verify.py executes only fixed argument lists; no user input reaches subprocess.
+skips = ["B404", "B603"]

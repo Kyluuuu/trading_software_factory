@@ -1,0 +1,13 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {"label": "setup", "type": "process", "command": "uv", "args": ["sync", "--locked", "--python", "3.12"]},
+    {"label": "format", "type": "process", "command": "uv", "args": ["run", "python", "scripts/verify.py", "format"]},
+    {"label": "lint", "type": "process", "command": "uv", "args": ["run", "python", "scripts/verify.py", "lint"]},
+    {"label": "typecheck", "type": "process", "command": "uv", "args": ["run", "python", "scripts/verify.py", "typecheck"]},
+    {"label": "test", "type": "process", "command": "uv", "args": ["run", "python", "scripts/verify.py", "test"]},
+    {"label": "security", "type": "process", "command": "uv", "args": ["run", "python", "scripts/verify.py", "security"]},
+    {"label": "architecture", "type": "process", "command": "uv", "args": ["run", "python", "scripts/verify.py", "architecture"]},
+    {"label": "verify", "type": "process", "command": "uv", "args": ["run", "python", "scripts/verify.py", "verify"], "group": {"kind": "test", "isDefault": true}}
+  ]
+}

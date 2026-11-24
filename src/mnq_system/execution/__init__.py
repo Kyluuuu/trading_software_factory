@@ -1,0 +1,1 @@
+"""Validated order coordination boundary."""

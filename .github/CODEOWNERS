@@ -1,0 +1,5 @@
+* @repository-owner
+/.github/ @repository-owner
+/src/mnq_system/domain/ @repository-owner
+/src/mnq_system/risk/ @repository-owner
+/src/mnq_system/live/ @repository-owner

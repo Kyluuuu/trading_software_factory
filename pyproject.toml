@@ -1,5 +1,5 @@
 [build-system]
-requires = ["hatchling==1.27.0"]
+requires = ["hatchling==1.33.0"]
 build-backend = "hatchling.build"
 
 [project]
@@ -9,22 +9,22 @@ description = "Safety-critical foundation for MNQ futures research"
 readme = "README.md"
 requires-python = ">=3.12,<3.13"
 dependencies = [
-  "pydantic==2.12.4",
-  "pydantic-settings==2.14.2",
+  "pydantic==2.14.4",
+  "pydantic-settings==2.16.3",
   "PyYAML==6.0.3",
 ]
 
 [dependency-groups]
 dev = [
-  "bandit==1.9.2",
+  "bandit==1.9.4",
   "detect-secrets==1.5.0",
-  "hypothesis==6.148.3",
-  "pip-audit==2.9.0",
-  "pre-commit==4.5.0",
-  "pyright==1.1.407",
-  "pytest==9.0.3",
-  "pytest-cov==7.0.0",
-  "ruff==0.14.6",
+  "hypothesis==6.170.17",
+  "pip-audit==2.10.1",
+  "pre-commit==4.7.0",
+  "pyright==1.1.414",
+  "pytest==9.2.0",
+  "pytest-cov==7.1.0",
+  "ruff==0.17.6",
 ]
 
 [tool.hatch.build.targets.wheel]

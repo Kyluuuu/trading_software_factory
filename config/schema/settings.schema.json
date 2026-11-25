@@ -56,6 +56,34 @@
     "SecretSettings": {
       "additionalProperties": false,
       "properties": {
+        "alpaca_api_key": {
+          "anyOf": [
+            {
+              "format": "password",
+              "type": "string",
+              "writeOnly": true
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Alpaca Api Key"
+        },
+        "alpaca_api_secret": {
+          "anyOf": [
+            {
+              "format": "password",
+              "type": "string",
+              "writeOnly": true
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Alpaca Api Secret"
+        },
         "provider_token": {
           "anyOf": [
             {
@@ -101,6 +129,24 @@
   },
   "additionalProperties": false,
   "properties": {
+    "allowed_symbols": {
+      "default": [
+        "AAPL",
+        "MSFT",
+        "NVDA",
+        "SPY",
+        "QQQ",
+        "VOO",
+        "AMD",
+        "META",
+        "TSLA"
+      ],
+      "items": {
+        "type": "string"
+      },
+      "title": "Allowed Symbols",
+      "type": "array"
+    },
     "broker": {
       "$ref": "#/$defs/Provider",
       "default": "disabled"
@@ -140,7 +186,7 @@
           "type": "string"
         }
       ],
-      "default": "0.03",
+      "default": "0.05",
       "title": "Maximum Daily Loss Fraction"
     },
     "maximum_drawdown_fraction": {
@@ -153,7 +199,7 @@
           "type": "string"
         }
       ],
-      "default": "0.10",
+      "default": "0.30",
       "title": "Maximum Drawdown Fraction"
     },
     "maximum_risk_fraction": {
@@ -166,8 +212,23 @@
           "type": "string"
         }
       ],
-      "default": "0.01",
+      "default": "0.001",
       "title": "Maximum Risk Fraction"
+    },
+    "minimum_symbol_coverage": {
+      "anyOf": [
+        {
+          "maximum": 100.0,
+          "minimum": 0.0,
+          "type": "number"
+        },
+        {
+          "pattern": "^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d*$",
+          "type": "string"
+        }
+      ],
+      "default": "99.0",
+      "title": "Minimum Symbol Coverage"
     },
     "permitted_symbol": {
       "default": "MNQ",

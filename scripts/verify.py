@@ -32,7 +32,7 @@ _SKIPPED_DIRECTORIES = frozenset(
 )
 # uv.lock holds dependency hashes, not secrets, and would otherwise dominate the
 # scanner's high-entropy findings. The baseline cannot scan itself.
-_SKIPPED_FILES = frozenset({"uv.lock", ".secrets.baseline", ".coverage", "coverage.xml"})
+_SKIPPED_FILES = frozenset({"uv.lock", ".secrets.baseline", ".coverage", "coverage.xml", ".env"})
 _SKIPPED_SUFFIXES = frozenset(
     {".pyc", ".db", ".sqlite", ".sqlite3", ".parquet", ".csv", ".joblib", ".pkl"}
 )

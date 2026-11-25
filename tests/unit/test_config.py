@@ -55,15 +55,15 @@ def test_environment_overrides_custom_configuration_files(
 ) -> None:
     custom = tmp_path / "custom.yaml"
     custom.write_text(
-        "permitted_symbol: MNQ\nmaximum_risk_fraction: '0.02'\n",
+        "permitted_symbol: MNQ\nmaximum_risk_fraction: '0.0008'\n",
         encoding="utf-8",
     )
-    assert load_settings(custom).maximum_risk_fraction == Decimal("0.02")
+    assert load_settings(custom).maximum_risk_fraction == Decimal("0.0008")
     monkeypatch.setenv("MNQ_PERMITTED_SYMBOL", "MES")
-    monkeypatch.setenv("MNQ_MAXIMUM_RISK_FRACTION", "0.005")
+    monkeypatch.setenv("MNQ_MAXIMUM_RISK_FRACTION", "0.0005")
     settings = load_settings(custom)
     assert settings.permitted_symbol == "MES"
-    assert settings.maximum_risk_fraction == Decimal("0.005")
+    assert settings.maximum_risk_fraction == Decimal("0.0005")
 
 
 def test_custom_configuration_file_cannot_enable_live_trading(tmp_path: Path) -> None:

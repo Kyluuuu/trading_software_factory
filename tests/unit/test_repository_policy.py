@@ -59,6 +59,19 @@ def test_secret_scanner_is_wired_into_shared_commands(path: Path) -> None:
     assert "detect-secrets-hook" in path.read_text(encoding="utf-8")
 
 
+def test_local_dotenv_is_excluded_from_secret_scanner() -> None:
+    from importlib.util import module_from_spec, spec_from_file_location
+
+    spec = spec_from_file_location("verify_script", Path("scripts/verify.py"))
+    assert spec is not None
+    assert spec.loader is not None
+    module = module_from_spec(spec)
+    spec.loader.exec_module(module)
+    files = list(module.scannable_files())
+    assert ".env" not in files
+    assert ".env.example" in files
+
+
 def test_ci_runs_the_canonical_security_command() -> None:
     workflow = Path(".github/workflows/ci.yml").read_text(encoding="utf-8")
     assert "scripts/verify.py security" in workflow

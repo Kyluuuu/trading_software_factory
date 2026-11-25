@@ -1,8 +1,11 @@
 environment: development
 permitted_symbol: MNQ
-maximum_risk_fraction: "0.01"
-maximum_daily_loss_fraction: "0.03"
-maximum_drawdown_fraction: "0.10"
+# Offline stock/ETF research allowlist; not enabled for broker submission.
+allowed_symbols: [AAPL, MSFT, NVDA, SPY, QQQ, VOO, AMD, META, TSLA]
+minimum_symbol_coverage: "99.0"
+maximum_risk_fraction: "0.001"
+maximum_daily_loss_fraction: "0.05"
+maximum_drawdown_fraction: "0.30"
 session:
   timezone: America/New_York
   start: "09:30:00"

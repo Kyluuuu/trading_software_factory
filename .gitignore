@@ -12,10 +12,10 @@ __pycache__/
 htmlcov/
 coverage.xml
 
-data/
-models/
-artifacts/
-reports/
+/data/
+/models/
+/artifacts/
+/reports/
 *.db
 *.sqlite*
 *.parquet

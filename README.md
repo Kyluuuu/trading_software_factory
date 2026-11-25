@@ -14,6 +14,12 @@ Secret scanning uses `detect-secrets` with the committed `.secrets.baseline`, an
 
 ## Configuration
 
-`config/default.yaml` supplies conservative committed defaults. `MNQ_` environment variables override model defaults using `__` for nesting. Secrets are environment-only, excluded from snapshots and representations, and optional in development/tests. Unknown keys and every live/submission-enabled configuration fail closed.
+`config/default.yaml` supplies conservative committed defaults. `MNQ_` environment variables override model defaults using `__` for nesting. Secrets are loaded from environment or an ignored local `.env`, excluded from snapshots and representations, and optional in development/tests. Unknown keys and every live/submission-enabled configuration fail closed.
 
-See `docs/architecture/` for boundaries and CI mapping. Unresolved decisions: confirmed MNQ contract specifications, data provider, broker, commission, and slippage assumptions. All remain disabled or zero pending independent confirmation.
+## Offline stock/ETF testing (no orders)
+
+The offline risk policy allows AAPL, MSFT, NVDA, SPY, QQQ and VOO by default. It requires a stop on the loss side of each proposal and a caller-supplied `AccountSnapshot` with current equity, session-opening equity and high-water equity. It checks the configured weekday/session window, 1% per-order equity budget, 3% daily loss budget and 10% drawdown budget, including the proposal's estimated loss. Costs are modeled as round-trip per-share commission and price slippage; configure nonzero, verified values before drawing conclusions. A stop is **not** a guaranteed fill price. No holiday calendar, ongoing position monitor, existing-exposure aggregation, strategy, or broker execution is implemented.
+
+For optional **read-only** Alpaca paper-account discovery, put paper keys in the ignored `.env` file (`MNQ_SECRETS__ALPACA_API_KEY` and `MNQ_SECRETS__ALPACA_API_SECRET`). Never use live credentials. No network request occurs on import or construction; `AlpacaReadOnlyClient(load_settings()).tradable_symbols()` queries active assets and filters the allowlist, and `.account_equity()` returns display-only equity and previous-close equity. These values do not provide the verified session-opening and peak equity needed for a risk decision. Run offline tests with `make test`; all Alpaca responses are mocked. Never treat this as an automated paper trader.
+
+See `docs/architecture/` for boundaries and CI mapping. Unresolved decisions: confirmed MNQ contract specifications, data provider, broker, commission, and slippage assumptions. Broker submission remains disabled.

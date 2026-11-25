@@ -32,6 +32,7 @@ class OrderIntent:
     quantity: ContractQuantity
     reference_price: Price
     created_at: UtcTimestamp
+    stop_price: Price | None = None
 
 
 _AUTHORITY_TOKEN = object()

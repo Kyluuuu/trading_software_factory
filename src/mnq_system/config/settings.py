@@ -12,6 +12,7 @@ import yaml
 from pydantic import BaseModel, ConfigDict, Field, SecretStr, field_validator, model_validator
 from pydantic_settings import (
     BaseSettings,
+    DotEnvSettingsSource,
     PydanticBaseSettingsSource,
     SettingsConfigDict,
     YamlConfigSettingsSource,
@@ -70,6 +71,8 @@ class CostSettings(StrictModel):
 
 class SecretSettings(StrictModel):
     provider_token: SecretStr | None = Field(default=None, exclude=True, repr=False)
+    alpaca_api_key: SecretStr | None = Field(default=None, exclude=True, repr=False)
+    alpaca_api_secret: SecretStr | None = Field(default=None, exclude=True, repr=False)
 
 
 class Settings(BaseSettings):
@@ -78,6 +81,7 @@ class Settings(BaseSettings):
         env_nested_delimiter="__",
         extra="forbid",
         frozen=True,
+        env_file=".env",
     )
 
     @classmethod
@@ -93,15 +97,28 @@ class Settings(BaseSettings):
         return (
             init_settings,
             env_settings,
+            DotEnvSettingsSource(settings_cls, env_file=".env", env_file_encoding="utf-8"),
             YamlConfigSettingsSource(settings_cls, yaml_file=_CONFIG_PATH.get()),
             file_secret_settings,
         )
 
     environment: Environment = Environment.DEVELOPMENT
     permitted_symbol: str = "MNQ"
-    maximum_risk_fraction: Decimal = Decimal("0.01")
-    maximum_daily_loss_fraction: Decimal = Decimal("0.03")
-    maximum_drawdown_fraction: Decimal = Decimal("0.10")
+    allowed_symbols: tuple[str, ...] = (
+        "AAPL",
+        "MSFT",
+        "NVDA",
+        "SPY",
+        "QQQ",
+        "VOO",
+        "AMD",
+        "META",
+        "TSLA",
+    )
+    minimum_symbol_coverage: Decimal = Field(default=Decimal("99.0"), ge=0, le=100)
+    maximum_risk_fraction: Decimal = Decimal("0.001")
+    maximum_daily_loss_fraction: Decimal = Decimal("0.05")
+    maximum_drawdown_fraction: Decimal = Decimal("0.30")
     session: SessionSettings = SessionSettings()
     costs: CostSettings = CostSettings()
     data_provider: Provider = Provider.DISABLED
@@ -124,8 +141,21 @@ class Settings(BaseSettings):
     def valid_symbol(cls, value: str) -> str:
         return Symbol(value).value
 
+    @field_validator("allowed_symbols")
+    @classmethod
+    def valid_allowed_symbols(cls, values: tuple[str, ...]) -> tuple[str, ...]:
+        if not values or len(set(values)) != len(values):
+            raise ValueError("allowed symbols must be nonempty and unique")
+        return tuple(Symbol(value).value for value in values)
+
     @model_validator(mode="after")
     def fail_closed(self) -> Self:
+        if (
+            self.maximum_risk_fraction > Decimal("0.001")
+            or self.maximum_daily_loss_fraction > Decimal("0.05")
+            or self.maximum_drawdown_fraction > Decimal("0.30")
+        ):
+            raise ValueError("risk limits cannot exceed safety ceilings")
         if self.live_trading_enabled or self.broker_submission_enabled:
             raise ValueError("live trading and broker submission are unavailable in this milestone")
         if self.environment is Environment.LIVE:

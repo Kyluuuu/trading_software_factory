@@ -20,5 +20,6 @@
     "**/__pycache__": true,
     ".venv": true,
     "htmlcov": true
-  }
+  },
+  "python.terminal.useEnvFile": true
 }

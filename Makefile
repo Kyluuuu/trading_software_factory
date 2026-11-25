@@ -1,8 +1,12 @@
-.PHONY: setup format lint typecheck test security architecture config verify
+.PHONY: setup hooks format lint typecheck test security secrets architecture config verify
 
 setup:
 	uv python install 3.12
 	uv sync --locked --python 3.12
+	uv run pre-commit install
+
+hooks:
+	uv run pre-commit install
 
 format:
 	uv run python scripts/verify.py format
@@ -18,6 +22,9 @@ test:
 
 security:
 	uv run python scripts/verify.py security
+
+secrets:
+	uv run python scripts/verify.py secrets # pragma: allowlist secret
 
 architecture:
 	uv run python scripts/verify.py architecture

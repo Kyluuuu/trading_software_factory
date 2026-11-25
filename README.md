@@ -4,11 +4,13 @@ Safety-oriented Python 3.12 foundation for future MNQ futures research. It conta
 
 ## Setup
 
-Install `uv`, then run `make setup`. On Windows or without Make, run `uv python install 3.12` followed by `uv sync --locked --python 3.12`.
+Install `uv`, then run `make setup`; this also installs the Git pre-commit hook. On Windows or without Make, run `uv python install 3.12`, `uv sync --locked --python 3.12`, then `uv run pre-commit install`. Existing checkouts can install or repair the hook with `make hooks`.
 
 ## Commands
 
-`make format`, `make lint`, `make typecheck`, `make architecture`, `make test`, `make security`, and `make verify` call `scripts/verify.py`. Without Make use `uv run python scripts/verify.py <command>`. `verify` is the required pre-commit/CI-equivalent check; dependency auditing may access vulnerability indexes.
+`make format`, `make lint`, `make typecheck`, `make architecture`, `make test`, `make security`, `make secrets`, and `make verify` call `scripts/verify.py`. Without Make use `uv run python scripts/verify.py <command>`. `verify` is the required pre-commit/CI-equivalent check; dependency auditing may access vulnerability indexes.
+
+Secret scanning uses `detect-secrets` with the committed `.secrets.baseline`, and runs from `make secrets`, `make verify`, pre-commit and CI. Mark a confirmed false positive with an inline `pragma: allowlist secret` comment instead of excluding whole directories.
 
 ## Configuration
 

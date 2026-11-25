@@ -33,7 +33,9 @@ _TRANSITIONS: dict[tuple[PositionState, PositionEvent], PositionState] = {
     (PositionState.LONG, PositionEvent.REQUEST_EXIT): PositionState.PENDING_EXIT,
     (PositionState.SHORT, PositionEvent.REQUEST_EXIT): PositionState.PENDING_EXIT,
     (PositionState.PENDING_EXIT, PositionEvent.FILL_EXIT): PositionState.FLAT,
-    (PositionState.PENDING_EXIT, PositionEvent.CANCEL): PositionState.FLAT,
+    # CANCEL is deliberately absent from PENDING_EXIT: a cancelled exit leaves the
+    # original position open, and this machine cannot yet represent that side, so
+    # reporting FLAT would understate exposure.
     (PositionState.HALTED, PositionEvent.ADMIN_RESET): PositionState.FLAT,
 }
 for _state in PositionState:

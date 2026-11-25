@@ -7,6 +7,7 @@
     {"label": "typecheck", "type": "process", "command": "uv", "args": ["run", "python", "scripts/verify.py", "typecheck"]},
     {"label": "test", "type": "process", "command": "uv", "args": ["run", "python", "scripts/verify.py", "test"]},
     {"label": "security", "type": "process", "command": "uv", "args": ["run", "python", "scripts/verify.py", "security"]},
+    {"label": "secrets", "type": "process", "command": "uv", "args": ["run", "python", "scripts/verify.py", "secrets"]},
     {"label": "architecture", "type": "process", "command": "uv", "args": ["run", "python", "scripts/verify.py", "architecture"]},
     {"label": "verify", "type": "process", "command": "uv", "args": ["run", "python", "scripts/verify.py", "verify"], "group": {"kind": "test", "isDefault": true}}
   ]

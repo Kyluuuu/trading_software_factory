@@ -1,6 +1,6 @@
 """Permanently disabled broker adapter for the foundation milestone."""
 
-from mnq_system.domain.orders import RiskApprovedOrder
+from mnq_system.domain.orders import RiskApprovedOrder, require_risk_approved_order
 
 
 class BrokerSubmissionDisabled(RuntimeError):
@@ -9,5 +9,5 @@ class BrokerSubmissionDisabled(RuntimeError):
 
 class DisabledBrokerAdapter:
     def accept(self, order: RiskApprovedOrder) -> None:
-        del order
+        require_risk_approved_order(order)
         raise BrokerSubmissionDisabled("broker submission is disabled")

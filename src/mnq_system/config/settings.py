@@ -1,5 +1,6 @@
 """Typed, fail-closed application configuration."""
 
+from contextvars import ContextVar
 from datetime import time
 from decimal import Decimal
 from enum import Enum
@@ -17,6 +18,12 @@ from pydantic_settings import (
 )
 
 from mnq_system.domain.values import RiskFraction, Symbol
+
+DEFAULT_CONFIG_PATH = Path("config/default.yaml")
+
+# The YAML path is scoped per load so every caller uses one settings pipeline with
+# identical precedence: constructor values, environment, YAML, then file secrets.
+_CONFIG_PATH: ContextVar[Path] = ContextVar("mnq_config_path", default=DEFAULT_CONFIG_PATH)
 
 
 class Environment(Enum):
@@ -71,7 +78,6 @@ class Settings(BaseSettings):
         env_nested_delimiter="__",
         extra="forbid",
         frozen=True,
-        yaml_file="config/default.yaml",
     )
 
     @classmethod
@@ -87,7 +93,7 @@ class Settings(BaseSettings):
         return (
             init_settings,
             env_settings,
-            YamlConfigSettingsSource(settings_cls),
+            YamlConfigSettingsSource(settings_cls, yaml_file=_CONFIG_PATH.get()),
             file_secret_settings,
         )
 
@@ -131,13 +137,19 @@ class Settings(BaseSettings):
         return self.model_dump(mode="json", exclude={"secrets"})
 
 
-def load_settings(path: Path = Path("config/default.yaml")) -> Settings:
-    """Load committed defaults, then apply MNQ_ environment overrides."""
+def load_settings(path: Path = DEFAULT_CONFIG_PATH) -> Settings:
+    """Load the given YAML file, then apply MNQ_ environment overrides.
+
+    Every path uses the same settings pipeline, so environment variables always
+    override file values regardless of which file was supplied.
+    """
     if not path.is_file():
         raise ValueError(f"configuration file does not exist: {path}")
     loaded = cast("object", yaml.safe_load(path.read_text(encoding="utf-8")))
     if not isinstance(loaded, dict):
         raise ValueError("configuration root must be a mapping")
-    if path == Path("config/default.yaml"):
+    token = _CONFIG_PATH.set(path)
+    try:
         return Settings()
-    return Settings.model_validate(loaded)
+    finally:
+        _CONFIG_PATH.reset(token)

@@ -31,7 +31,8 @@ class ContractQuantity:
     value: int
 
     def __post_init__(self) -> None:
-        if isinstance(self.value, bool) or self.value <= 0:
+        # `type(...) is not int` rejects bool, float, Decimal and numeric subclasses.
+        if type(self.value) is not int or self.value <= 0:
             raise DomainValidationError("contract quantity must be a positive integer")
 
 

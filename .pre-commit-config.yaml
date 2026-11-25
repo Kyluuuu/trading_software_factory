@@ -2,7 +2,7 @@ default_install_hook_types: [pre-commit]
 default_stages: [pre-commit]
 repos:
   - repo: https://github.com/pre-commit/pre-commit-hooks
-    rev: v6.0.0
+    rev: 3e8a8703264a2f4a69428a0aa4dcb512790b2c8c # v6.0.0
     hooks:
       - id: trailing-whitespace
       - id: end-of-file-fixer
@@ -13,7 +13,7 @@ repos:
         args: [--maxkb=1024]
       - id: detect-private-key
   - repo: https://github.com/astral-sh/ruff-pre-commit
-    rev: v0.14.6
+    rev: fa1ed65ba95bfa7771a71003a9d74402541f5a5c # v0.14.6
     hooks:
       - id: ruff-check
       - id: ruff-format
@@ -30,8 +30,8 @@ repos:
         entry: uv run python scripts/verify.py check-config
         language: system
         pass_filenames: false
-      - id: secret-patterns
-        name: common secret patterns
-        entry: '(?i)(api[_-]?key|secret[_-]?key|access[_-]?token)[ :=]+[A-Za-z0-9_/-]{16,}'
-        language: pygrep
-        exclude: '^(\.env\.example|tests/)'
+      - id: detect-secrets
+        name: detect secrets
+        entry: uv run detect-secrets-hook --baseline .secrets.baseline
+        language: system
+        exclude: '^(uv\.lock|\.secrets\.baseline)$'

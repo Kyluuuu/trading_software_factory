@@ -17,6 +17,7 @@ dependencies = [
 [dependency-groups]
 dev = [
   "bandit==1.9.2",
+  "detect-secrets==1.5.0",
   "hypothesis==6.148.3",
   "pip-audit==2.9.0",
   "pre-commit==4.5.0",
@@ -40,11 +41,7 @@ select = [
 ]
 ignore = [
   "S101", # Assertions are the idiomatic contract in tests.
-  "S603", # verify.py uses fixed, repository-owned subprocess commands.
 ]
-
-[tool.ruff.lint.per-file-ignores]
-"tests/**/*.py" = ["S105", "S106"] # Test-only fake secrets exercise redaction.
 
 [tool.ruff.format]
 quote-style = "double"
@@ -84,5 +81,5 @@ exclude_also = ["if TYPE_CHECKING:", '\.\.\.']
 recurse = true
 targets = ["src", "scripts"]
 exclude_dirs = ["tests"]
-# verify.py executes only fixed argument lists; no user input reaches subprocess.
-skips = ["B404", "B603"]
+# No global skips: subprocess findings must be justified at the call site.
+skips = []

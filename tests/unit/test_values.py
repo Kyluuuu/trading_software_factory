@@ -1,5 +1,7 @@
+from collections.abc import Callable
 from datetime import UTC, datetime
 from decimal import Decimal
+from typing import cast
 
 import pytest
 
@@ -17,18 +19,28 @@ from mnq_system.domain.values import (
 )
 
 
-@pytest.mark.parametrize("value", [0, -1, True])
-def test_invalid_contract_quantity_is_rejected(value: int) -> None:
-    with pytest.raises(DomainValidationError):
-        ContractQuantity(value)
+@pytest.mark.parametrize("value", [0, -1, True, False, 1.5, 2.0, Decimal("1.5"), Decimal(1), "1"])
+def test_invalid_contract_quantity_is_rejected(value: object) -> None:
+    with pytest.raises(DomainValidationError, match="positive integer"):
+        ContractQuantity(cast("int", value))
+
+
+@pytest.mark.parametrize("value", [1, 2, 10_000])
+def test_exact_positive_integer_quantities_are_accepted(value: int) -> None:
+    assert ContractQuantity(value).value == value
 
 
 @pytest.mark.parametrize("value", [Decimal("NaN"), Decimal("Infinity"), Decimal("-Infinity")])
-def test_non_finite_money_and_price_are_rejected(value: Decimal) -> None:
-    with pytest.raises(DomainValidationError):
-        Money(value)
-    with pytest.raises(DomainValidationError):
-        Price(value)
+@pytest.mark.parametrize(
+    "factory",
+    [Money, Price, PortfolioEquity, RiskFraction, StopDistance],
+)
+def test_non_finite_values_are_rejected_by_every_decimal_type(
+    factory: Callable[[Decimal], object],
+    value: Decimal,
+) -> None:
+    with pytest.raises(DomainValidationError, match="finite"):
+        factory(value)
 
 
 def test_negative_equity_and_non_positive_stop_are_rejected() -> None:

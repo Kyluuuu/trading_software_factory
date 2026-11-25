@@ -1,3 +1,4 @@
+from decimal import Decimal
 from pathlib import Path
 
 import pytest
@@ -46,6 +47,37 @@ def test_default_yaml_loads() -> None:
 def test_environment_overrides_committed_yaml(monkeypatch: pytest.MonkeyPatch) -> None:
     monkeypatch.setenv("MNQ_PERMITTED_SYMBOL", "MES")
     assert load_settings().permitted_symbol == "MES"
+
+
+def test_environment_overrides_custom_configuration_files(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    custom = tmp_path / "custom.yaml"
+    custom.write_text(
+        "permitted_symbol: MNQ\nmaximum_risk_fraction: '0.02'\n",
+        encoding="utf-8",
+    )
+    assert load_settings(custom).maximum_risk_fraction == Decimal("0.02")
+    monkeypatch.setenv("MNQ_PERMITTED_SYMBOL", "MES")
+    monkeypatch.setenv("MNQ_MAXIMUM_RISK_FRACTION", "0.005")
+    settings = load_settings(custom)
+    assert settings.permitted_symbol == "MES"
+    assert settings.maximum_risk_fraction == Decimal("0.005")
+
+
+def test_custom_configuration_file_cannot_enable_live_trading(tmp_path: Path) -> None:
+    custom = tmp_path / "live.yaml"
+    custom.write_text("live_trading_enabled: true\n", encoding="utf-8")
+    with pytest.raises(ValidationError, match="unavailable"):
+        load_settings(custom)
+
+
+def test_custom_configuration_file_rejects_unknown_fields(tmp_path: Path) -> None:
+    custom = tmp_path / "unknown.yaml"
+    custom.write_text("unknown_setting: true\n", encoding="utf-8")
+    with pytest.raises(ValidationError, match="Extra inputs are not permitted"):
+        load_settings(custom)
 
 
 def test_loader_rejects_missing_and_non_mapping_files(tmp_path: Path) -> None:
